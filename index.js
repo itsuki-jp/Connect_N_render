@@ -109,7 +109,7 @@ io.on('connection', (socket) => {
     });
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = Number(process.env.PORT) || 3000;
 // We make the http server listen on port 3000
 server.listen(PORT, () => {
     console.log('listening on: ', PORT);
