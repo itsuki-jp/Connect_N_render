@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Socket.IO chat</title>
+    <style>
+        body {
+            margin: 0;
+            padding-bottom: 3rem;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        #form {
+            background: rgba(0, 0, 0, 0.15);
+            padding: 0.25rem;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            height: 3rem;
+            box-sizing: border-box;
+            backdrop-filter: blur(10px);
+        }
+
+        #input {
+            border: none;
+            padding: 0 1rem;
+            flex-grow: 1;
+            border-radius: 2rem;
+            margin: 0.25rem;
+        }
+
+        #input:focus {
+            outline: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="main">
+        <form action="" id="joinRoomForm">
+            <input type="text" name="" id="joinRoomInput">
+            <button id="joinRoomBtn">Join Room</button>
+        </form>
+
+        <form action="" id="createRoomForm">
+            <input type="text" name="" id="sizeX" placeholder="19">
+            <input type="text" name="" id="sizeY" placeholder="19">
+            <input type="text" name="" id="n" placeholder="5">
+            <button id="createRoomBtn">Create Room</button>
+        </form>
+    </div>
+
+
+    <!-- ライブラリの読み込み -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        var messages = document.getElementById('messages');
+        const form = document.getElementById("form");
+        const input = document.getElementById("joinRoomInput");
+
+        document.getElementById('joinRoomForm').addEventListener("submit", (e) => {
+            e.preventDefault();
+            const input = document.getElementById("joinRoomInput");
+            // Todo: numeric check(input.value)
+            if (input.value) {
+                socket.emit("join room", input.value);
+                input.value = "";
+            }
+        });
+
+        document.getElementById('createRoomForm').addEventListener("submit", (e) => {
+            e.preventDefault();
+            console.log("click");
+            const sizeX = document.getElementById("sizeX").value;
+            const sizeY = document.getElementById("sizeY").value;
+            const n = document.getElementById("n").value;
+            // Todo: numeric check(sizeX.value, sizeY.value)
+            socket.emit("create room", parseInt(sizeX), parseInt(sizeY), parseInt(n));
+        });
+
+        socket.on("start game", () => {
+            console.log("start game");
+            document.write("<h1>GAME</h1>");
+        })
+    </script>
+</body>
+
+</html>
