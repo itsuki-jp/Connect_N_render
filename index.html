@@ -45,9 +45,9 @@
         </form>
 
         <form action="" id="createRoomForm">
-            <input type="text" name="" id="sizeX" placeholder="19">
-            <input type="text" name="" id="sizeY" placeholder="19">
-            <input type="text" name="" id="n" placeholder="5">
+            <input type="text" name="" id="sizeX" value="13">
+            <input type="text" name="" id="sizeY" value="13">
+            <input type="text" name="" id="n" value="5">
             <button id="createRoomBtn">Create Room</button>
         </form>
     </div>
@@ -57,11 +57,7 @@
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
-
-        var messages = document.getElementById('messages');
-        const form = document.getElementById("form");
-        const input = document.getElementById("joinRoomInput");
-
+        // Create, Join Room
         document.getElementById('joinRoomForm').addEventListener("submit", (e) => {
             e.preventDefault();
             const input = document.getElementById("joinRoomInput");
@@ -74,18 +70,85 @@
 
         document.getElementById('createRoomForm').addEventListener("submit", (e) => {
             e.preventDefault();
-            console.log("click");
             const sizeX = document.getElementById("sizeX").value;
             const sizeY = document.getElementById("sizeY").value;
             const n = document.getElementById("n").value;
             // Todo: numeric check(sizeX.value, sizeY.value)
             socket.emit("create room", parseInt(sizeX), parseInt(sizeY), parseInt(n));
+
+            socket.on("get value", roomId => {
+                const showRoomId_p = document.createElement("h1");
+                showRoomId_p.innerText = `Your Room ID: ${roomId}`;
+                document.getElementById("main").appendChild(showRoomId_p);
+            })
         });
 
-        socket.on("start game", () => {
+        socket.on("start game", (y, x) => {
             console.log("start game");
-            document.write("<h1>GAME</h1>");
+            initGame(y, x);
         })
+
+
+        // Start Game
+        const tileX = 30;
+        const tileY = 30;
+
+        function initGame(y, x) {
+            const main = document.getElementById("main");
+            main.innerHTML = "";
+
+            const canvas = document.createElement("canvas");
+            canvas.setAttribute("id", "canvas")
+            canvas.width = 500;
+            canvas.height = 500;
+            const ctx = canvas.getContext("2d");
+            document.getElementById("main").appendChild(canvas);
+
+            clearBoard(y, x, ctx);
+
+            document.getElementById("canvas").addEventListener("click", (e) => {
+                const rect = e.target.getBoundingClientRect();
+
+                const viewX = e.clientX - rect.left;
+                const viewY = e.clientY - rect.top;
+
+                const scaleWidth = canvas.clientWidth / canvas.width;
+                const scaleHeight = canvas.clientHeight / canvas.height;
+
+                // ブラウザ上でのクリック座標をキャンバス上に変換
+                const canvasX = Math.floor(viewX / scaleWidth);
+                const canvasY = Math.floor(viewY / scaleHeight);
+
+                socket.emit("check placeable", Math.floor(canvasY / tileY), Math.floor(canvasX / tileX));
+            });
+        }
+
+        socket.on("draw tile", (y, x, colour) => {
+            console.log("draw tile")
+            drawTile(y, x, document.getElementById("canvas").getContext("2d"), colour);
+        });
+
+        function clearBoard(y, x, ctx) {
+            ctx.beginPath();
+            ctx.fillStyle = "#FFE4B5";
+            ctx.fillRect(0, 0, x * tileX, y * tileY);
+            ctx.strokeStyle = 'black';
+            for (let i = 0; i < y; i++) {
+                for (let j = 0; j < x; j++) {
+                    ctx.rect(j * tileX, i * tileY, tileX, tileY);
+                    ctx.lineWidth = 1;
+                }
+            }
+            ctx.stroke();
+        }
+
+        function drawTile(y, x, ctx, colour) {
+            ctx.beginPath()
+            ctx.fillStyle = colour ? 'black' : 'white';
+            ctx.fillRect(x * tileX, y * tileY, tileX, tileY);
+            ctx.stroke();
+
+        }
     </script>
 </body>
 
