@@ -99,8 +99,8 @@
 
             const canvas = document.createElement("canvas");
             canvas.setAttribute("id", "canvas")
-            canvas.width = 500;
-            canvas.height = 500;
+            canvas.width = tileX * x;
+            canvas.height = tileY * y;
             const ctx = canvas.getContext("2d");
             document.getElementById("main").appendChild(canvas);
 
@@ -115,7 +115,6 @@
                 const scaleWidth = canvas.clientWidth / canvas.width;
                 const scaleHeight = canvas.clientHeight / canvas.height;
 
-                // ブラウザ上でのクリック座標をキャンバス上に変換
                 const canvasX = Math.floor(viewX / scaleWidth);
                 const canvasY = Math.floor(viewY / scaleHeight);
 
@@ -127,6 +126,11 @@
             console.log("draw tile")
             drawTile(y, x, document.getElementById("canvas").getContext("2d"), colour);
         });
+
+        socket.on("show message", msg => {
+            console.log("show message");
+            alert(msg);
+        })
 
         function clearBoard(y, x, ctx) {
             ctx.beginPath();
