@@ -155,7 +155,7 @@
             ctx.beginPath();
             ctx.fillStyle = "#FFE4B5";
             ctx.fillRect(0, 0, x * tileX, y * tileY);
-            ctx.strokeStyle = 'grey';
+            ctx.strokeStyle = 'black';
             for (let i = 0; i < y; i++) {
                 for (let j = 0; j < x; j++) {
                     ctx.rect(j * tileX, i * tileY, tileX, tileY);
@@ -170,7 +170,7 @@
             ctx.beginPath()
             ctx.fillStyle = colour ? 'black' : '#ffffd1';
             ctx.fillRect(x * tileX, y * tileY, tileX, tileY);
-            ctx.strokeStyle = 'grey';
+            ctx.strokeStyle = 'black';
             ctx.rect(x * tileX, y * tileY, tileX, tileY);
             ctx.stroke();
             ctx.closePath();
