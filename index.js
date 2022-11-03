@@ -13,10 +13,6 @@ app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
 });
 
-app.get('game.html', (req, res) => {
-    res.sendFile(__dirname + '/game.html');
-})
-
 console.log(__dirname);
 
 const client_room_id_map = {}
@@ -41,6 +37,7 @@ class Board {
         this.currentTurn = 0;
         this.n = n;
         this.board = board;
+        this.remain = sizeX * sizeY;
     }
 
     copy(board) {
@@ -55,6 +52,15 @@ class Board {
 
     putStone(y, x) {
         this.board[y][x] = this.currentTurn;
+        this.remain--;
+    }
+
+    checkDraw() {
+        return this.remain === 0;
+    }
+
+    changeTurn() {
+        this.currentTurn ^= 1;
     }
 }
 
@@ -139,8 +145,10 @@ io.on('connection', (socket) => {
                 if (clientTmp !== socket.id) message = "You lose";
                 io.to(clientTmp).emit("show message", message);
             }
+        } else if (currentBoard.checkDraw()) {
+            io.to(roomId).emit("show message", "Draw");
         }
-        currentBoard.currentTurn ^= 1;
+        currentBoard.changeTurn();
     })
 });
 

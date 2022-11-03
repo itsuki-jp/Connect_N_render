@@ -2,37 +2,40 @@
 <html>
 
 <head>
-    <title>Socket.IO chat</title>
+    <title>Connect N</title>
     <style>
-        body {
-            margin: 0;
-            padding-bottom: 3rem;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        }
-
-        #form {
-            background: rgba(0, 0, 0, 0.15);
-            padding: 0.25rem;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
+        .wrap {
             display: flex;
-            height: 3rem;
-            box-sizing: border-box;
-            backdrop-filter: blur(10px);
+            flex-direction: column;
+            align-items: center;
         }
 
-        #input {
-            border: none;
-            padding: 0 1rem;
-            flex-grow: 1;
-            border-radius: 2rem;
-            margin: 0.25rem;
+        button {
+            padding: 50px;
+            margin: 5px;
+            background: #41538e;
+            color: #FFF;
+
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            width: 50%;
+            font-size: 30px;
         }
 
-        #input:focus {
-            outline: none;
+        form {
+            padding: 10px;
+            margin: 20px;
+        }
+
+        input {
+            margin: 10px;
+            padding: 20px;
+            width: 50%;
+        }
+
+        h1 {
+            text-align: center;
         }
     </style>
 </head>
@@ -40,15 +43,19 @@
 <body>
     <div id="main">
         <form action="" id="joinRoomForm">
-            <input type="text" name="" id="joinRoomInput">
-            <button id="joinRoomBtn">Join Room</button>
+            <div class="wrap">
+                <input type="text" name="" id="joinRoomInput">
+                <button id="joinRoomBtn">Join Room</button>
+            </div>
         </form>
 
         <form action="" id="createRoomForm">
-            <input type="text" name="" id="sizeX" value="13">
-            <input type="text" name="" id="sizeY" value="13">
-            <input type="text" name="" id="n" value="5">
-            <button id="createRoomBtn">Create Room</button>
+            <div class="wrap">
+                <input type="text" name="" id="sizeX" placeholder="width">
+                <input type="text" name="" id="sizeY" placeholder="height">
+                <input type="text" name="" id="n" placeholder="connect number">
+                <button id="createRoomBtn">Create Room</button>
+            </div>
         </form>
     </div>
 
@@ -68,15 +75,27 @@
             }
         });
 
+        function isNumber(input) {
+            let pattern = /^(?!0+$)\d+$/;
+            return pattern.test(input);
+        }
+
         document.getElementById('createRoomForm').addEventListener("submit", (e) => {
             e.preventDefault();
             const sizeX = document.getElementById("sizeX").value;
             const sizeY = document.getElementById("sizeY").value;
             const n = document.getElementById("n").value;
-            // Todo: numeric check(sizeX.value, sizeY.value)
+            for (let input of [sizeX, sizeY, n]) {
+                if (!isNumber(input)) {
+                    alert('Please Enter valid number');
+                    console.log("error");
+                    return;
+                };
+            }
             socket.emit("create room", parseInt(sizeX), parseInt(sizeY), parseInt(n));
 
             socket.on("get value", roomId => {
+                document.getElementById("main").innerHTML = "";
                 const showRoomId_p = document.createElement("h1");
                 showRoomId_p.innerText = `Your Room ID: ${roomId}`;
                 document.getElementById("main").appendChild(showRoomId_p);
@@ -136,7 +155,7 @@
             ctx.beginPath();
             ctx.fillStyle = "#FFE4B5";
             ctx.fillRect(0, 0, x * tileX, y * tileY);
-            ctx.strokeStyle = 'black';
+            ctx.strokeStyle = 'grey';
             for (let i = 0; i < y; i++) {
                 for (let j = 0; j < x; j++) {
                     ctx.rect(j * tileX, i * tileY, tileX, tileY);
@@ -148,8 +167,10 @@
 
         function drawTile(y, x, ctx, colour) {
             ctx.beginPath()
-            ctx.fillStyle = colour ? 'black' : 'white';
+            ctx.fillStyle = colour ? 'black' : '#ffffd1';
             ctx.fillRect(x * tileX, y * tileY, tileX, tileY);
+            ctx.strokeStyle = 'grey';
+            ctx.rect(x * tileX, y * tileY, tileX, tileY);
             ctx.stroke();
 
         }
