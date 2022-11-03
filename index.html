@@ -163,6 +163,7 @@
                 }
             }
             ctx.stroke();
+            ctx.closePath();
         }
 
         function drawTile(y, x, ctx, colour) {
@@ -172,7 +173,7 @@
             ctx.strokeStyle = 'grey';
             ctx.rect(x * tileX, y * tileY, tileX, tileY);
             ctx.stroke();
-
+            ctx.closePath();
         }
     </script>
 </body>
